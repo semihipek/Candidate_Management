@@ -80,8 +80,6 @@ namespace tasks_sem
 
                 }
             }
-
-
         }
 
         public static void CreateCandidate()
