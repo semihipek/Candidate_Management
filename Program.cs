@@ -87,7 +87,7 @@ namespace tasks_sem
         public static void CreateCandidate()
 
         {
-            candidate.id
+            
             Console.WriteLine("\nCREATE\nUsername:");
             candidate.username = Console.ReadLine();
             Console.WriteLine("\nEmail:");
