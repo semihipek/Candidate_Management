@@ -21,7 +21,14 @@ namespace tasks_sem
         static void Main(string[] args)
         {
 
+            start();
+           
+        }
 
+
+
+        public static void start()
+        {
             bool ok = true;
 
             while (ok)
@@ -35,18 +42,18 @@ namespace tasks_sem
                     //1)CREATE
                     case "1":
 
-                        CreateCandidate();
+                        Create();
 
                         break;
                     //2)DELETE
                     case "2":
-                        DeleteCandidate();
+                        Delete();
                         break;
 
                     //3)UPDATE 
                     case "3":
 
-                        UpdateCandidate();
+                        Update();
                         break; ;
 
 
@@ -80,9 +87,10 @@ namespace tasks_sem
 
                 }
             }
+
         }
 
-        public static void CreateCandidate()
+        public static void Create()
 
         {
             
@@ -99,7 +107,7 @@ namespace tasks_sem
             SaveCandidatesToFile(data);
         }
 
-        public static void DeleteCandidate()
+        public static void Delete()
         {
 
             Console.WriteLine("DELETE\nWhat is the name of the username you want to delete?");
@@ -121,7 +129,7 @@ namespace tasks_sem
 
         }
 
-        public static void UpdateCandidate()
+        public static void Update()
         {
             Console.WriteLine("\nUPDATE\nUsername to update:\n");
             string usernametoupdate = Console.ReadLine();
