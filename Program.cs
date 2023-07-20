@@ -12,17 +12,18 @@ using System.Threading;
 
 namespace tasks_sem
 {
-    class Program
+   public class Program
     {
 
-        static CandidateManagement candidateManagement = new CandidateManagement();
+         
 
         static void Main(string[] args)
         {
-            candidateManagement.LoadDataFromFile();
+            CandidateManagement candidateManagement = new CandidateManagement();
+            candidateManagement.start();
+            
 
 
-            start();
 
         }
         }

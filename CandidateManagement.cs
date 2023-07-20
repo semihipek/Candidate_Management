@@ -5,27 +5,29 @@ using System.IO;
 namespace tasks_sem
 {
 
-    public class Candidate
-    {
-        public int id { get; set; }
-        public string username { get; set; }
-        public string email { get; set; }
-        public string phone { get; set; }
-    }
+   
     public class CandidateManagement
     {
+
+       
+
         private List<Candidate> data = new List<Candidate>();
+
+       
+
         public  void start()
         {
+
+            LoadDataFromFile();
             bool ok = true;
 
             while (ok)
             {
                 Console.WriteLine("\nHangi sayi:\n1)Create\n2)Delete\n3)Update\n4)Read All Candidates\n5)Read Specific Candidate\n6)Close the app");
-                string key = Console.ReadLine();
+                
 
 
-                switch (key)
+                switch (Console.ReadLine())
                 {
                     //1)CREATE
                     case "1":
@@ -53,11 +55,11 @@ namespace tasks_sem
 
 
                     //5)READ
-                    /*
+                    
                     case "5":
 
-                        ReadAllCandidates();
-                        break;*/
+                        Read();
+                        break;
 
 
                     //6)CLOSE THE APP
@@ -78,11 +80,11 @@ namespace tasks_sem
 
         }
 
-        public  void Create()
+        private  void Create()
 
         {
-
-            Console.WriteLine("\nCREATE\nUsername:");
+            Candidate candidate = new Candidate();
+            Console.WriteLine("\nCREATE\n---------------\nUsername:");
             candidate.username = Console.ReadLine();
             Console.WriteLine("\nEmail:");
 
@@ -95,10 +97,10 @@ namespace tasks_sem
             SaveCandidatesToFile(data);
         }
 
-        public static void Delete()
+        public  void Delete()
         {
-
-            Console.WriteLine("DELETE\nWhat is the name of the username you want to delete?");
+            Candidate candidate = new Candidate();
+            Console.WriteLine("DELETE\n---------------\nWhat is the name of the username you want to delete?");
             string usernametodelete = Console.ReadLine();
 
 
@@ -119,16 +121,17 @@ namespace tasks_sem
 
         public  void Update()
         {
-            Console.WriteLine("\nUPDATE\nUsername to update:\n");
+            Candidate candidate = new Candidate();
+            Console.WriteLine("\nUPDATE\n---------------\nUsername to update:\n");
             string usernametoupdate = Console.ReadLine();
 
             candidate = data.Find(candidate => candidate.username == usernametoupdate);
             if (candidate != null)
             {
                 Console.WriteLine("\nWhich information you want to update:\n\n1)Username\n2)Email\n3)Phone\n");
-                string keyUpdate = Console.ReadLine();
+                
 
-                switch (keyUpdate)
+                switch (Console.ReadLine())
                 {
 
                     case "1":
@@ -164,12 +167,39 @@ namespace tasks_sem
             SaveCandidatesToFile(data);
 
         }
-        public  void ReadAllCandidates()
+
+        public void Read()
         {
-            Console.WriteLine("\nAll Candidates:\n");
+
+            
+            Console.WriteLine("Which candidate you want to read:\nUsername:");
+            string usernametoread =Console.ReadLine();
+            bool found=false;
             foreach (Candidate item in data)
             {
-                Console.WriteLine(item.id);
+
+
+                if (item.username == usernametoread)
+                {
+                    Console.WriteLine("-----------------\n"+item.username);
+                    Console.WriteLine(item.email);
+                    Console.WriteLine(item.phone);
+                    found = true;  
+                }
+            }
+
+            if(!found) 
+                {
+                    Console.WriteLine($"Candidate with username '{usernametoread}' not found.");
+                }
+                    
+        }
+        public  void ReadAllCandidates()
+        {
+            Console.WriteLine("\nAll Candidates:\n---------------");
+            foreach (Candidate item in data)
+            {
+                
                 Console.WriteLine(item.username);
                 Console.WriteLine(item.email);
                 Console.WriteLine(item.phone);
@@ -191,36 +221,35 @@ namespace tasks_sem
 
             Console.WriteLine("Candidates saved to the file.");
         }
-        public List<Candidate> LoadDataFromFile()
+       private void LoadDataFromFile()
+{
+    try
+    {
+        using (StreamReader reader = new StreamReader("C:\\Users\\ASUS\\OneDrive - GALATASARAY UNIVERSITESI\\Masaüstü\\tasks_sem\\candidates.txt"))
         {
-            List<Candidate> data = new List<Candidate>();
-            try
+            string line;
+            while ((line = reader.ReadLine()) != null)
             {
-                using (StreamReader reader = new StreamReader("C:\\Users\\ASUS\\OneDrive - GALATASARAY UNIVERSITESI\\Masaüstü\\tasks_sem\\candidates.txt"))
+                string[] parts = line.Split(',');
+                if (parts.Length == 3)
                 {
-                    string line;
-                    while ((line = reader.ReadLine()) != null)
+                    Candidate candidate = new Candidate
                     {
-                        string[] parts = line.Split(',');
-                        if (parts.Length == 3)
-                        {
-                            Candidate candidate = new Candidate
-                            {
-                                username = parts[0],
-                                email = parts[1],
-                                phone = parts[2],
-                            };
-                            data.Add(candidate);
-                        }
-                    }
+                        username = parts[0],
+                        email = parts[1],
+                        phone = parts[2],
+                    };
+                    data.Add(candidate);
                 }
             }
-            catch (FileNotFoundException)
-            {
-
-            }
-            return data;
         }
+    }
+    catch (FileNotFoundException)
+    {
+        // The file was not found, which is normal if it's the first run or the file is empty.
+        // You can handle this case as needed.
+    }
+}
 
 
 
