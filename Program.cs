@@ -20,6 +20,7 @@ namespace tasks_sem
         static void Main(string[] args)
         {
             CandidateManagement candidateManagement = new CandidateManagement();
+
             candidateManagement.start();
             
 

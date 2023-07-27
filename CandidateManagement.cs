@@ -5,17 +5,16 @@ using System.IO;
 namespace tasks_sem
 {
 
-   
+
     public class CandidateManagement
     {
 
-       
+
 
         private List<Candidate> data = new List<Candidate>();
-
-       
-
-        public  void start()
+        private int lastAssignedId = 0;
+        bool found = false;
+        public void start()
         {
 
             LoadDataFromFile();
@@ -24,7 +23,7 @@ namespace tasks_sem
             while (ok)
             {
                 Console.WriteLine("\nHangi sayi:\n1)Create\n2)Delete\n3)Update\n4)Read All Candidates\n5)Read Specific Candidate\n6)Close the app");
-                
+
 
 
                 switch (Console.ReadLine())
@@ -55,7 +54,7 @@ namespace tasks_sem
 
 
                     //5)READ
-                    
+
                     case "5":
 
                         Read();
@@ -80,10 +79,12 @@ namespace tasks_sem
 
         }
 
-        private  void Create()
+        private void Create()
 
         {
             Candidate candidate = new Candidate();
+
+            candidate.id = data.Count + 1;
             Console.WriteLine("\nCREATE\n---------------\nUsername:");
             candidate.username = Console.ReadLine();
             Console.WriteLine("\nEmail:");
@@ -94,32 +95,61 @@ namespace tasks_sem
             data.Add(candidate);
 
 
+
             SaveCandidatesToFile(data);
         }
 
-        public  void Delete()
+        public void Delete()
         {
-            Candidate candidate = new Candidate();
-            Console.WriteLine("DELETE\n---------------\nWhat is the name of the username you want to delete?");
-            string usernametodelete = Console.ReadLine();
+            bool flag1=true;
+          
 
-
-            candidate = data.Find(candidate => candidate.username == usernametodelete);
-            if (candidate != null)
+            while (flag1)
             {
-                data.Remove(candidate);
-                Console.WriteLine($"Candidate with username '{usernametodelete}' deleted successfully.");
+                Console.WriteLine("\n\nPress 1 :Delete a candidate whose username is known\nPress 2: Take a look at candidates");
+                string op = Console.ReadLine();
+                if (op == "1")
+                {
+                    Read();
+                    if (found)
+                    {
+                        flag1= false;
+                    }
+                
+                }
+                else if (op == "2")
+                {
+                    ReadAllCandidates();
+                    flag1 = false;
+                }
+            }
+            Candidate candidate = new Candidate();
+            Console.WriteLine("DELETE\n---------------\nWhat is the ID of the username you want to delete?");
+
+            string Id = Console.ReadLine();
+
+            if(int.TryParse(Id, out int IdInput)) { 
+                candidate = data.Find(candidate => candidate.id == IdInput);
+                if (candidate != null)
+                {
+                    candidate.isDeleted = true;
+                    Console.WriteLine($"Candidate with username '{IdInput}' deleted successfully.");
+                }
+                else
+                {
+                    Console.WriteLine($"Candidate with username '{IdInput}' not found.");
+                }
             }
             else
             {
-                Console.WriteLine($"Candidate with username '{usernametodelete}' not found.");
+                Console.WriteLine("Invalid input type. Please enter a valid integer");
             }
             SaveCandidatesToFile(data);
 
 
         }
 
-        public  void Update()
+        public void Update()
         {
             Candidate candidate = new Candidate();
             Console.WriteLine("\nUPDATE\n---------------\nUsername to update:\n");
@@ -129,7 +159,7 @@ namespace tasks_sem
             if (candidate != null)
             {
                 Console.WriteLine("\nWhich information you want to update:\n\n1)Username\n2)Email\n3)Phone\n");
-                
+
 
                 switch (Console.ReadLine())
                 {
@@ -171,90 +201,115 @@ namespace tasks_sem
         public void Read()
         {
 
-            
+
             Console.WriteLine("Which candidate you want to read:\nUsername:");
-            string usernametoread =Console.ReadLine();
-            bool found=false;
+            string usernametoread = Console.ReadLine();
+            
             foreach (Candidate item in data)
             {
 
 
-                if (item.username == usernametoread)
+                if (item.username == usernametoread && !item.isDeleted)
                 {
-                    Console.WriteLine("-----------------\n"+item.username);
+                    Console.WriteLine("-----------------\n" + item.id);
+                    Console.WriteLine(item.username);
                     Console.WriteLine(item.email);
                     Console.WriteLine(item.phone);
-                    found = true;  
+                    found = true;
                 }
             }
 
-            if(!found) 
-                {
-                    Console.WriteLine($"Candidate with username '{usernametoread}' not found.");
-                }
-                    
+            if (!found)
+            {
+                Console.WriteLine($"Candidate with username '{usernametoread}' not found.");
+            }
+
         }
-        public  void ReadAllCandidates()
+        public void ReadAllCandidates()
         {
             Console.WriteLine("\nAll Candidates:\n---------------");
             foreach (Candidate item in data)
             {
-                
-                Console.WriteLine(item.username);
-                Console.WriteLine(item.email);
-                Console.WriteLine(item.phone);
-                Console.WriteLine();
+
+                if (!item.isDeleted)
+                {
+                    Console.WriteLine(item.id);
+
+                    Console.WriteLine(item.username);
+                    Console.WriteLine(item.email);
+                    Console.WriteLine(item.phone);
+                    Console.WriteLine();
+                }
             }
 
         }
 
-
-        private  void SaveCandidatesToFile(List<Candidate> candidates)
+        private void SaveCandidatesToFile(List<Candidate> candidates)
         {
             using (StreamWriter writer = new StreamWriter("C:\\Users\\ASUS\\OneDrive - GALATASARAY UNIVERSITESI\\Masaüstü\\tasks_sem\\candidates.txt"))
             {
+                writer.WriteLine(lastAssignedId); // Write the lastAssignedId to the first line
                 foreach (var candidate in candidates)
                 {
-                    writer.WriteLine($"{candidate.username},{candidate.email},{candidate.phone}");
+                    if (!candidate.isDeleted)
+                    {
+                        writer.WriteLine($"{candidate.id},{candidate.username},{candidate.email},{candidate.phone}");
+                    }
                 }
             }
 
             Console.WriteLine("Candidates saved to the file.");
         }
-       private void LoadDataFromFile()
-{
-    try
-    {
-        using (StreamReader reader = new StreamReader("C:\\Users\\ASUS\\OneDrive - GALATASARAY UNIVERSITESI\\Masaüstü\\tasks_sem\\candidates.txt"))
+
+        private void LoadDataFromFile()
         {
-            string line;
-            while ((line = reader.ReadLine()) != null)
+            try
             {
-                string[] parts = line.Split(',');
-                if (parts.Length == 3)
+                using (StreamReader reader = new StreamReader("C:\\Users\\ASUS\\OneDrive - GALATASARAY UNIVERSITESI\\Masaüstü\\tasks_sem\\candidates.txt"))
                 {
-                    Candidate candidate = new Candidate
+                    string line;
+                    int maxId = 0;
+                    while ((line = reader.ReadLine()) != null)
                     {
-                        username = parts[0],
-                        email = parts[1],
-                        phone = parts[2],
-                    };
-                    data.Add(candidate);
+                        string[] parts = line.Split(',');
+                        if (parts.Length == 4)
+                        {
+                            int id = int.Parse(parts[0]);
+                            Candidate candidate = new Candidate
+                            {
+                                id = id,
+                                username = parts[1],
+                                email = parts[2],
+                                phone = parts[3],
+                            };
+
+                            if (id > maxId)
+                            {
+                                maxId = id;
+                            }
+
+                            lastAssignedId = Math.Max(lastAssignedId + 1, id + 1);
+                            data.Add(candidate);
+                        }
+                    }
                 }
+            }
+            catch (FileNotFoundException)
+            {
+                // The file was not found, which is normal if it's the first run or the file is empty.
+                // You can handle this case as needed.
             }
         }
     }
-    catch (FileNotFoundException)
-    {
-        // The file was not found, which is normal if it's the first run or the file is empty.
-        // You can handle this case as needed.
-    }
 }
 
+    
 
 
-    }
-} 
+
+
+    
+ 
 
 
 
