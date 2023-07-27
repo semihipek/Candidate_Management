@@ -84,7 +84,7 @@ namespace tasks_sem
         {
             Candidate candidate = new Candidate();
 
-            candidate.id = data.Count + 1;
+            candidate.id = lastAssignedId + 1;
             Console.WriteLine("\nCREATE\n---------------\nUsername:");
             candidate.username = Console.ReadLine();
             Console.WriteLine("\nEmail:");
@@ -94,6 +94,7 @@ namespace tasks_sem
             candidate.phone = Console.ReadLine();
             data.Add(candidate);
 
+            lastAssignedId++;
 
 
             SaveCandidatesToFile(data);
@@ -101,8 +102,8 @@ namespace tasks_sem
 
         public void Delete()
         {
-            bool flag1=true;
-          
+            bool flag1 = true;
+
 
             while (flag1)
             {
@@ -113,9 +114,9 @@ namespace tasks_sem
                     Read();
                     if (found)
                     {
-                        flag1= false;
+                        flag1 = false;
                     }
-                
+
                 }
                 else if (op == "2")
                 {
@@ -128,7 +129,8 @@ namespace tasks_sem
 
             string Id = Console.ReadLine();
 
-            if(int.TryParse(Id, out int IdInput)) { 
+            if (int.TryParse(Id, out int IdInput))
+            {
                 candidate = data.Find(candidate => candidate.id == IdInput);
                 if (candidate != null)
                 {
@@ -143,6 +145,11 @@ namespace tasks_sem
             else
             {
                 Console.WriteLine("Invalid input type. Please enter a valid integer");
+            }
+
+            if (IdInput == lastAssignedId)
+            {
+                lastAssignedId--;
             }
             SaveCandidatesToFile(data);
 
@@ -204,7 +211,7 @@ namespace tasks_sem
 
             Console.WriteLine("Which candidate you want to read:\nUsername:");
             string usernametoread = Console.ReadLine();
-            
+
             foreach (Candidate item in data)
             {
 
@@ -248,7 +255,7 @@ namespace tasks_sem
         {
             using (StreamWriter writer = new StreamWriter("C:\\Users\\ASUS\\OneDrive - GALATASARAY UNIVERSITESI\\Masaüstü\\tasks_sem\\candidates.txt"))
             {
-                writer.WriteLine(lastAssignedId); // Write the lastAssignedId to the first line
+                writer.WriteLine(lastAssignedId);
                 foreach (var candidate in candidates)
                 {
                     if (!candidate.isDeleted)
@@ -268,7 +275,11 @@ namespace tasks_sem
                 using (StreamReader reader = new StreamReader("C:\\Users\\ASUS\\OneDrive - GALATASARAY UNIVERSITESI\\Masaüstü\\tasks_sem\\candidates.txt"))
                 {
                     string line;
-                    int maxId = 0;
+                    if ((line = reader.ReadLine()) != null)
+                    {
+                        lastAssignedId = int.Parse(line);
+                    }
+
                     while ((line = reader.ReadLine()) != null)
                     {
                         string[] parts = line.Split(',');
@@ -283,12 +294,6 @@ namespace tasks_sem
                                 phone = parts[3],
                             };
 
-                            if (id > maxId)
-                            {
-                                maxId = id;
-                            }
-
-                            lastAssignedId = Math.Max(lastAssignedId + 1, id + 1);
                             data.Add(candidate);
                         }
                     }
@@ -296,23 +301,14 @@ namespace tasks_sem
             }
             catch (FileNotFoundException)
             {
-                // The file was not found, which is normal if it's the first run or the file is empty.
-                // You can handle this case as needed.
+
             }
         }
-    }
-}
-
-    
-
-
-
-
-    
- 
+        } }
 
 
 
 
 
-    
+
+
